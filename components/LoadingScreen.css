@@ -1,0 +1,160 @@
+/* Aevine.design — minimalist loading screen (white / black only) */
+
+.aevine-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  justify-items: center;
+  background: #ffffff;
+  color: #000000;
+  font-family: var(--font-display, "Syne", sans-serif);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.aevine-loader.is-exiting {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.aevine-loader__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(2.5rem, 6vw, 3.75rem);
+  width: min(92vw, 42rem);
+  margin: 0 auto;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.aevine-loader__logo-slot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Logo always owns layout; canvas paints exactly on top of it */
+.aevine-loader__logo {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.06em;
+  font-weight: 800;
+  font-size: clamp(2.25rem, 9vw, 5.5rem);
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+  color: #000000;
+  opacity: 0;
+  pointer-events: none;
+  text-align: center;
+}
+
+.aevine-loader__logo.is-active {
+  opacity: 1;
+}
+
+.aevine-loader__canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.aevine-loader__canvas.is-active {
+  opacity: 1;
+}
+
+.aevine-loader__line {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.aevine-loader__char {
+  display: inline-block;
+  transform: translateY(0);
+  will-change: transform;
+}
+
+.aevine-loader__logo.is-bouncing .aevine-loader__char {
+  animation: aevine-letter-bounce 0.7s both;
+}
+
+@keyframes aevine-letter-bounce {
+  0% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  32% {
+    transform: translateY(-0.22em);
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.aevine-loader__progress-block {
+  width: min(100%, 22rem);
+  margin: 0 auto;
+}
+
+.aevine-loader__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 0.55rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #000000;
+}
+
+.aevine-loader__track {
+  height: 0.55rem;
+  border: 1px solid #000000;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.aevine-loader__fill {
+  height: 100%;
+  width: 0%;
+  background: #000000;
+  transform-origin: left center;
+  will-change: width;
+}
+
+html.is-loading,
+html.is-loading body {
+  background: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aevine-loader__char {
+    animation: none !important;
+  }
+
+  .aevine-loader {
+    transition: none;
+  }
+}

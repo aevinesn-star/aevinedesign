@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project — Aevine.design</title>
+    <meta name="description" content="Project detail — Aevine.design" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Syne:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="page-project">
+    <div class="noise" aria-hidden="true"></div>
+
+    <header class="site-header is-scrolled is-visible">
+      <a class="logo" href="./" id="site-logo">Aevine.design</a>
+      <script>
+        (function () {
+          try {
+            var s = sessionStorage.getItem("aevine-return-section");
+            if (s) document.getElementById("site-logo").setAttribute("href", "./#" + s);
+          } catch (e) {}
+        })();
+      </script>
+      <nav class="nav" aria-label="Primary">
+        <a href="./#branding">Branding</a>
+        <a href="./#campaign">Campaign</a>
+        <a href="./#editorial">Editorial</a>
+        <a href="./#modeling">3D</a>
+        <a href="./#more">More</a>
+        <a href="./#about">About</a>
+      </nav>
+      <a class="header-cta" href="./#about">Contact</a>
+      <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </header>
+
+    <div class="mobile-nav" hidden>
+      <a href="./#branding">Branding</a>
+      <a href="./#campaign">Campaign</a>
+      <a href="./#editorial">Editorial</a>
+      <a href="./#modeling">3D Modeling</a>
+      <a href="./#more">More Works</a>
+      <a href="./#about">About Me</a>
+    </div>
+
+    <main class="project-main" id="project-root">
+      <p class="project-loading">Loading project…</p>
+    </main>
+
+    <footer class="site-footer">
+      <p class="footer-brand">Aevine.design</p>
+      <p class="footer-note">© <span id="year"></span> · All rights reserved</p>
+      <a class="footer-top" href="#project-root">Back to top</a>
+    </footer>
+
+    <script src="./projects.js"></script>
+    <script src="./main.js"></script>
+    <script src="./project.js"></script>
+  </body>
+</html>

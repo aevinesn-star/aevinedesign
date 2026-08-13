@@ -1,0 +1,55 @@
+/* Hero = spiral gallery — black field, original hero typography */
+
+.project-gallery3d--spiral {
+  position: relative;
+  width: 100%;
+  height: 380vh;
+  background: #000000;
+  color: #f2f5f1;
+}
+
+.project-gallery3d__sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Bottom-left — beat .hero-copy { position: relative } from styles.css */
+.project-gallery3d__sticky > .hero-copy.project-gallery3d__hero-copy {
+  position: absolute;
+  top: auto;
+  right: auto;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  max-width: 42rem;
+  margin: 0;
+  padding: 0 clamp(1.25rem, 4vw, 3rem) clamp(2.5rem, 6vw, 4.5rem);
+  pointer-events: none;
+  animation: riseIn 1.1s var(--ease, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.project-gallery3d__hero-copy .cta-group {
+  pointer-events: auto;
+}
+
+.project-gallery3d__stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.project-gallery3d__stage canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+@media (max-width: 720px) {
+  .project-gallery3d--spiral {
+    height: 320vh;
+  }
+}
