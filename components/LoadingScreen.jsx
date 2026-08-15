@@ -15,19 +15,25 @@ const EXIT_MS = 700;
  *   Aevine
  *   .design
  * Pixel stage samples live glyph boxes so bounce stays on the same Y axis.
+ *
+ * When `loadProgress` is provided (0–100), the bar tracks real asset loading.
+ * Bounce/exit wait until `canFinish` is true (default: true).
  */
 export default function LoadingScreen({
   lineTop = LINE_TOP,
   lineBottom = LINE_BOTTOM,
   onComplete,
   duration = STAGE1_MS,
+  loadProgress,
+  canFinish = true,
 }) {
   const canvasRef = useRef(null);
   const logoRef = useRef(null);
   const wrapRef = useRef(null);
-  const [progress, setProgress] = useState(0);
+  const [animProgress, setAnimProgress] = useState(0);
   const [phase, setPhase] = useState("pixel");
   const [exiting, setExiting] = useState(false);
+  const [pixelDone, setPixelDone] = useState(false);
 
   const lines = useMemo(
     () => [
@@ -38,6 +44,18 @@ export default function LoadingScreen({
   );
 
   const letterCount = lineTop.length + lineBottom.length;
+
+  const useExternalProgress = typeof loadProgress === "number";
+  const progress = useExternalProgress
+    ? Math.max(0, Math.min(100, Math.round(loadProgress)))
+    : animProgress;
+
+  useEffect(() => {
+    document.documentElement.classList.add("is-loading");
+    return () => {
+      document.documentElement.classList.remove("is-loading");
+    };
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -113,7 +131,9 @@ export default function LoadingScreen({
       const elapsed = now - start;
       const t = Math.min(1, elapsed / duration);
 
-      setProgress(Math.round(t * 100));
+      if (!useExternalProgress) {
+        setAnimProgress(Math.round(t * 100));
+      }
 
       const cssW = canvas.clientWidth;
       const cssH = canvas.clientHeight;
@@ -132,8 +152,8 @@ export default function LoadingScreen({
       if (t < 1) {
         raf = requestAnimationFrame(draw);
       } else {
-        setProgress(100);
-        setPhase("bounce");
+        if (!useExternalProgress) setAnimProgress(100);
+        setPixelDone(true);
       }
     };
 
@@ -154,7 +174,13 @@ export default function LoadingScreen({
       disposed = true;
       cancelAnimationFrame(raf);
     };
-  }, [lineTop, lineBottom, duration]);
+  }, [lineTop, lineBottom, duration, useExternalProgress]);
+
+  // Hold on pixel stage until assets are ready, then bounce.
+  useEffect(() => {
+    if (phase !== "pixel" || !pixelDone || !canFinish) return;
+    setPhase("bounce");
+  }, [phase, pixelDone, canFinish]);
 
   useEffect(() => {
     if (phase !== "bounce") return undefined;
@@ -173,6 +199,8 @@ export default function LoadingScreen({
     if (phase !== "exit") return undefined;
     const t = window.setTimeout(() => {
       setPhase("done");
+      document.documentElement.classList.remove("is-loading");
+      document.documentElement.classList.add("is-ready");
       onComplete?.();
     }, EXIT_MS);
     return () => window.clearTimeout(t);

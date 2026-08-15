@@ -1,10 +1,20 @@
-import { Component, useEffect } from "react";
+import { Component, useCallback, useEffect, useState } from "react";
+import LoadingScreen from "../components/LoadingScreen.jsx";
 import ProjectGallery from "./components/ProjectGallery.jsx";
 import WorkSections from "./components/WorkSections.jsx";
+import { GALLERY_PROJECTS } from "./data/galleryProjects.js";
+import { PHOTOSHOOT } from "./data/photoshoot.js";
 import { withBase } from "./lib/base.js";
+import {
+  getHomepageImageUrls,
+  preloadImages,
+} from "./lib/preloadImages.js";
 import { consumeReturnSection, scrollToSection } from "./lib/scrollToSection.js";
 import "./styles/global.css";
 import "../styles.css";
+
+const ABOUT_SRC = withBase("/about/aevine.jpg");
+const LOAD_TIMEOUT_MS = 20000;
 
 class GalleryErrorBoundary extends Component {
   constructor(props) {
@@ -41,10 +51,58 @@ class GalleryErrorBoundary extends Component {
  * Homepage — spiral hero, then category work grids (3D opens video inline).
  */
 export default function App() {
+  const [loadProgress, setLoadProgress] = useState(0);
+  const [assetsReady, setAssetsReady] = useState(false);
+  const [showLoader, setShowLoader] = useState(true);
+
+  const handleLoaderComplete = useCallback(() => {
+    setShowLoader(false);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    let timedOut = false;
+
+    const urls = getHomepageImageUrls({
+      galleryProjects: GALLERY_PROJECTS,
+      photoshoot: PHOTOSHOOT,
+      aboutSrc: ABOUT_SRC,
+    });
+
+    const markReady = () => {
+      if (cancelled) return;
+      setLoadProgress(100);
+      setAssetsReady(true);
+    };
+
+    const timeout = window.setTimeout(() => {
+      timedOut = true;
+      markReady();
+    }, LOAD_TIMEOUT_MS);
+
+    preloadImages(urls, {
+      onProgress: (ratio) => {
+        if (cancelled || timedOut) return;
+        setLoadProgress(Math.round(ratio * 100));
+      },
+    }).then(() => {
+      if (cancelled || timedOut) return;
+      window.clearTimeout(timeout);
+      markReady();
+    });
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeout);
+    };
+  }, []);
+
   useEffect(() => {
     if ("scrollRestoration" in history) {
       history.scrollRestoration = "manual";
     }
+
+    if (showLoader) return undefined;
 
     const target = consumeReturnSection();
     if (target) {
@@ -62,14 +120,24 @@ export default function App() {
     };
     window.addEventListener("hashchange", onHashChange);
     window.addEventListener("pageshow", onPageShow);
+    // Hash scroll after loader reveals the page layout
+    scrollFromHash([0, 80, 250, 600]);
     return () => {
       window.removeEventListener("hashchange", onHashChange);
       window.removeEventListener("pageshow", onPageShow);
     };
-  }, []);
+  }, [showLoader]);
 
   return (
     <>
+      {showLoader ? (
+        <LoadingScreen
+          loadProgress={loadProgress}
+          canFinish={assetsReady}
+          onComplete={handleLoaderComplete}
+        />
+      ) : null}
+
       <div className="noise" aria-hidden="true" />
 
       <header className="site-header is-visible">
@@ -123,11 +191,11 @@ export default function App() {
           </div>
           <figure className="about-portrait">
             <img
-              src={withBase("/about/aevine.jpg")}
+              src={ABOUT_SRC}
               alt="Aevine"
               width={1280}
               height={1920}
-              loading="lazy"
+              loading="eager"
               decoding="async"
             />
           </figure>

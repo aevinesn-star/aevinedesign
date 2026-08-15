@@ -1,6 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="is-loading">
   <head>
+    <style>
+      html.is-loading,
+      html.is-loading body {
+        background: #ffffff;
+        overflow: hidden;
+      }
+      html.is-loading #root > *:not(.aevine-loader) {
+        visibility: hidden;
+      }
+    </style>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Aevine.design — Visual Designer</title>

@@ -147,6 +147,11 @@
 html.is-loading,
 html.is-loading body {
   background: #ffffff;
+  overflow: hidden;
+}
+
+html.is-loading #root > *:not(.aevine-loader) {
+  visibility: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {
