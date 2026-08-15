@@ -150,10 +150,6 @@ html.is-loading body {
   overflow: hidden;
 }
 
-html.is-loading #root > *:not(.aevine-loader) {
-  visibility: hidden;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .aevine-loader__char {
     animation: none !important;

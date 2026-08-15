@@ -302,7 +302,15 @@ export default function ProjectGallery({
       },
     });
 
-    return () => st.kill();
+    // Mount can happen right after the loader; refresh once layout is real.
+    const refreshId = window.requestAnimationFrame(() => {
+      ScrollTrigger.refresh();
+    });
+
+    return () => {
+      window.cancelAnimationFrame(refreshId);
+      st.kill();
+    };
   }, [list.length]);
 
   return (

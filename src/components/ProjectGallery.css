@@ -8,6 +8,19 @@
   color: #f2f5f1;
 }
 
+.project-gallery3d--spiral.is-revealed .project-gallery3d__sticky {
+  animation: spiralReveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes spiralReveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .project-gallery3d__sticky {
   position: sticky;
   top: 0;

@@ -104,14 +104,56 @@ export default function App() {
 
     if (showLoader) return undefined;
 
-    const target = consumeReturnSection();
-    if (target) {
-      scrollToSection(target);
+    const fromProject = /project\.html/i.test(document.referrer || "");
+
+    // After the intro loader, land on the spiral — not a leftover #branding hash.
+    if (!fromProject) {
+      const hash = window.location.hash.replace(/^#/, "");
+      if (hash && hash !== "top" && hash !== "gallery") {
+        history.replaceState(
+          null,
+          "",
+          `${window.location.pathname}${window.location.search}`
+        );
+      }
+      try {
+        sessionStorage.removeItem("aevine-return-section");
+      } catch {
+        /* ignore */
+      }
+    }
+
+    const lockToSpiral = () => {
+      window.scrollTo(0, 0);
+      import("gsap/ScrollTrigger")
+        .then(({ ScrollTrigger }) => {
+          ScrollTrigger.refresh();
+          requestAnimationFrame(() => window.scrollTo(0, 0));
+        })
+        .catch(() => {});
+    };
+
+    lockToSpiral();
+    const t1 = window.setTimeout(lockToSpiral, 80);
+    const t2 = window.setTimeout(lockToSpiral, 250);
+
+    // Only jump to a work section when returning from a project detail page.
+    if (fromProject) {
+      const target = consumeReturnSection();
+      if (target && target !== "top" && target !== "gallery") {
+        window.clearTimeout(t1);
+        window.clearTimeout(t2);
+        scrollToSection(target);
+      }
     }
 
     const scrollFromHash = (retries) => {
       const id = window.location.hash.replace(/^#/, "");
-      if (id && id !== "top") scrollToSection(id, retries ? { retries } : undefined);
+      if (id && id !== "top" && id !== "gallery") {
+        scrollToSection(id, retries ? { retries } : undefined);
+      } else if (!id || id === "top" || id === "gallery") {
+        window.scrollTo(0, 0);
+      }
     };
 
     const onHashChange = () => scrollFromHash([0, 80, 250]);
@@ -120,9 +162,10 @@ export default function App() {
     };
     window.addEventListener("hashchange", onHashChange);
     window.addEventListener("pageshow", onPageShow);
-    // Hash scroll after loader reveals the page layout
-    scrollFromHash([0, 80, 250, 600]);
+
     return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
       window.removeEventListener("hashchange", onHashChange);
       window.removeEventListener("pageshow", onPageShow);
     };
@@ -160,7 +203,7 @@ export default function App() {
 
       <main id="top">
         <GalleryErrorBoundary>
-          <ProjectGallery />
+          <ProjectGallery className={showLoader ? "" : "is-revealed"} />
         </GalleryErrorBoundary>
 
         <WorkSections />
